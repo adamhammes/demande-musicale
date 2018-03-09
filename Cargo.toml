@@ -1,0 +1,6 @@
+[package]
+name = "demande-musicale"
+version = "0.1.0"
+authors = ["Adam Hammes <adam@hammes.io>"]
+
+[dependencies]
