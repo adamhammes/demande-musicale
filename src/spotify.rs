@@ -26,7 +26,6 @@ impl SpotifyWrapper {
             .client_secret(&spotify_secret)
             .redirect_uri(&spotify_uri)
             .scope("playlist-modify-public")
-            .scope("user-modify-playback-state")
             .build();
         
         match get_token(&mut oauth) {
@@ -49,7 +48,7 @@ impl SpotifyWrapper {
 
     pub fn songs_in_playlist(&self) -> Option<Vec<FullTrack>> {
         let user_id = "thaunatos";
-        let playlist_id = "spotify:user:thaunatos:playlist:5JaR88hsCmzoa3WjpT8jhf";
+        let playlist_id = "5JaR88hsCmzoa3WjpT8jhf";
 
         let result = self.client.user_playlist_tracks(
             user_id, playlist_id, None, None, None, None
