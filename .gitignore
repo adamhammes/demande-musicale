@@ -1,4 +1,5 @@
 .env
+.spotify_token_cache.json
 
 /target/
 **/*.rs.bk
