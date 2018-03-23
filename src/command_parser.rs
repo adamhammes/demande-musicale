@@ -1,6 +1,8 @@
 extern crate regex;
 use self::regex::Regex;
 
+use url::{Host,Url};
+
 #[derive(Debug)]
 pub enum Command {
     Add(AddCommand),
@@ -19,11 +21,17 @@ impl AddCommand {
     fn parse(input: &str, user: &str) -> Option<AddCommand> {
         let regex = Regex::new(r"!add\s+(?P<uri>\S*)").unwrap();
 
-        let re_match = regex.captures(input);
+        let caps = regex.captures(input)?;
 
-        re_match.map(|caps| AddCommand {
-            uri: caps["uri"].to_owned(),
-            msg: "temp message".to_owned(),
+        let patterns: &[_] = &['<', '>'];
+        let trimmed = caps["uri"].trim_matches(patterns);
+
+        let uri = parse_uri(trimmed)?;
+
+
+        Some(AddCommand {
+            uri: uri.to_owned(),
+            msg: "tmp message".to_owned(),
             user: user.to_owned(),
         })
     }
@@ -52,5 +60,23 @@ pub fn parse_command(input: &str, user: &str) -> Command {
     } else {
         println!("error");
         Command::Error
+    }
+}
+
+fn parse_uri(input: &str) -> Option<String> {
+    let uri = Url::parse(input).ok()?;
+
+    match (uri.scheme(), uri.host()) {
+        ("spotify", _) => {
+            Some(input.to_owned())
+        }
+        ("https", Some(Host::Domain("open.spotify.com"))) => {
+            let cloned = uri.clone();
+            let path = cloned.path().to_owned();
+            Some(path)
+        }
+        (_, _) => {
+            None
+        }
     }
 }

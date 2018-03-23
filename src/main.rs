@@ -7,6 +7,8 @@ extern crate dotenv;
 use dotenv::dotenv;
 use std::env;
 
+extern crate url;
+
 mod command_handler;
 mod command_parser;
 mod spotify;
