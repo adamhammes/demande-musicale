@@ -14,6 +14,7 @@ mod command_parser;
 mod spotify;
 
 struct MessageHandler {
+    channel_name: String,
     handler: command_handler::Commander,
 }
 
@@ -25,6 +26,10 @@ impl slack::EventHandler for MessageHandler {
             Event::Message(msg_event) => {
                 if let Message::Standard(msg) = *msg_event {
                     if let (Some(txt), Some(user), Some(channel)) = (msg.text, msg.user, msg.channel) {
+                        if channel != self.channel_name {
+                            return;
+                        }
+
                         let command = command_parser::parse_command(&txt, &user);
                         let response = self.handler.handle(command);
 
@@ -42,6 +47,21 @@ impl slack::EventHandler for MessageHandler {
     }
 
     fn on_connect(&mut self, cli: &RtmClient) {
+        println!("on_connect");
+
+        self.channel_name = cli.start_response()
+            .channels
+            .as_ref()
+            .and_then(|channels| {
+                channels
+                    .iter()
+                    .find(|chan| match chan.name {
+                        None => false,
+                        Some(ref name) => name == "demande-musicale"
+                    })
+            }).and_then(|chan| chan.id.clone())
+            .expect("Couldn't find channel demande-musicale");
+        println!("{}", self.channel_name);
     }
 }
 
@@ -56,7 +76,8 @@ fn main() {
     };
     
     let mut handler = MessageHandler {
-        handler: command_handler
+        handler: command_handler,
+        channel_name: "".to_owned(),
     };
     
     let _ = RtmClient::login_and_run(&slack_key, &mut handler);
