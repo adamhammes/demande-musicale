@@ -34,7 +34,7 @@ impl Commander {
 
         if let Some(song) = result {
             if let Some(_) = self.spotify.add_song_to_playlist(&song.uri) {
-                Some(format!("{} was successfully added!", song.name))
+                Some(format!("\"{}\" was successfully added!", song.name))
             } else {
                 Some("Unable to add song :-(".to_owned())
             }
