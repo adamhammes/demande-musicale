@@ -18,7 +18,10 @@ impl Commander {
         let result = self.spotify.songs_in_playlist();
 
         if let Some(list) = result {
-            let names = list.iter().map(|item| item.name.clone()).collect::<Vec<_>>();
+            let names = list.iter().map(|item|
+                format!("{} - {}", item.name.clone(), item.artists[0].name)
+            ).collect::<Vec<_>>();
+
             Some(names.join("\n"))
         } else {
             println!("{:?}", result);
@@ -31,7 +34,7 @@ impl Commander {
 
         if let Some(song) = result {
             if let Some(_) = self.spotify.add_song_to_playlist(&song.uri) {
-                Some("Song successfully added!".to_owned())
+                Some(format!("{} was successfully added!", song.name))
             } else {
                 Some("Unable to add song :-(".to_owned())
             }
