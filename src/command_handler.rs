@@ -18,6 +18,9 @@ impl Commander {
         let result = self.spotify.songs_in_playlist();
 
         if let Some(list) = result {
+            if list.is_empty() {
+                return Some("No songs have been added yet. Would you like to be the first?".to_string());
+            }
             let names = list.iter().map(|item|
                 format!("{} - {}", item.name.clone(), item.artists[0].name)
             ).collect::<Vec<_>>();
